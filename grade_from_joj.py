@@ -2,20 +2,17 @@
 Canvas fast grading script from csv file of grades
 by makersmelx <makersmelx@gmail.com>
 """
-
+import canvasapi
 import utils
 import os
 import csv
-from canvasapi import Canvas
+from canvasapi import Canvas, exceptions
 import sys
 import settings
 
-canvas_full_score = sys.argv[4]
-joj_full_score = sys.argv[5]
-cli_weight = float(canvas_full_score) / float(joj_full_score)
 
-
-def joj_score_to_canvas_score(_student):
+def joj_score_to_canvas_score(_student, _canvas_full_score, _csv_full_score):
+    cli_weight = float(_canvas_full_score) / float(_csv_full_score)
     print('==============================')
     print("{}\t{}".format(
         _student[settings.csv_name_column], _student[settings.csv_sjtu_id_column]))
@@ -23,9 +20,7 @@ def joj_score_to_canvas_score(_student):
     if len(settings.csv_score_column) != len(settings.weight):
         print("Make sure that you can add a weight to all the columns you would like to include")
         exit(1)
-    if len(sys.argv) == 6:
-        # if set canvas and joj full score in cli args, then simply use the full score on JOJ to calculate
-        settings.weight = [cli_weight]
+    settings.weight = [cli_weight]
     for i in range(len(settings.csv_score_column)):
         _column_grade = _student[settings.csv_score_column[i]]
         try:
@@ -50,28 +45,39 @@ def joj_score_to_canvas_score(_student):
     return _score
 
 
-if __name__ == '__main__':
+def main(_csv_file, _course_id, _assignment_id, _canvas_full_score, _csv_full_score):
     utils.import_env()
     canvas_base_url = os.environ['CANVAS_BASE_URL']
     canvas_token = os.environ['CANVAS_TOKEN']
     umji_canvas = Canvas(canvas_base_url, canvas_token)
-    course = umji_canvas.get_course(sys.argv[2])
-    assignment = course.get_assignment(sys.argv[3])
+    course = None
+    assignment = None
+    try:
+        course = umji_canvas.get_course(_course_id)
+    except canvasapi.exceptions.ResourceDoesNotExist:
+        print("Course does not exist. Exit.", file=sys.stderr)
+        exit(1)
+    try:
+        assignment = course.get_assignment(_assignment_id)
+    except canvasapi.exceptions.ResourceDoesNotExist:
+        print("Assignment does not exist. Exit.", file=sys.stderr)
+        exit(1)
+
     students = {}
 
     for _student in course.get_users(enrollment_type=['student']):
         students[_student.id] = _student.sis_login_id
 
     joj_scores = {}
-    csv_path = sys.argv[1] if sys.argv[1] else settings.csv_path
-    with open(csv_path) as joj_csv:
+
+    with open(_csv_file) as joj_csv:
         joj_score = csv.reader(joj_csv)
         skip_line = 0
         for student_row in joj_score:
             if skip_line < settings.content_row:
                 skip_line += 1
                 continue
-            score = joj_score_to_canvas_score(student_row)
+            score = joj_score_to_canvas_score(student_row, _canvas_full_score, _csv_full_score)
             student_id = student_row[settings.csv_sjtu_id_column].strip()
             joj_scores[student_id] = score
 
@@ -83,4 +89,17 @@ if __name__ == '__main__':
             this_joj_score = joj_scores.get(this_student_sjtu_id, 0)
             print('SJTU ID:{}, Score:{}'.format(
                 this_student_sjtu_id, this_joj_score))
-        _submission.edit(submission={'posted_grade': this_joj_score})
+            _submission.edit(submission={'posted_grade': this_joj_score})
+
+
+try:
+    csv_file = sys.argv[1] if sys.argv[1] else settings.csv_path
+    course_id = sys.argv[2]
+    assignment_id = sys.argv[3]
+    canvas_full_score = float(sys.argv[4])
+    csv_full_score = float(sys.argv[5]) if len(sys.argv) > 5 else canvas_full_score
+    main(csv_file, course_id, assignment_id, canvas_full_score, csv_full_score)
+except ValueError as e:
+    print(e, file=sys.stderr)
+    print('The scores are invalid.', file=sys.stderr)
+    exit(1)

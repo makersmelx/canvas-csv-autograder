@@ -7,6 +7,7 @@ Grade Canvas assignment based on scores stored in the csv file. It can work with
 
 You can also use this script to upload scores on Canvas based on your own csv file (you should include students' sjtu id. OR if your csv have the same first three columns as JOJ 1.0 csv format)
 
+**Usage**
 ~~~shell script
 PYTHONPATH=. python grade_from_joj.py [csv_path] [course_id] [assignment_id] [canvas_full_score] [csv_full_score]
 ~~~
@@ -21,9 +22,10 @@ canvas_full_score: the full score of this assignment on canvas
 
 csv_full_score: the full score of this assignment/homework on joj (or the full score that leads to the score in your csv)
 
-### How to prepare your csv file
-By default, the thrid column of your csv should be the SJTU id of a student. The fourth column should be his total score.
-Prepare you csv following the above law.
+### How to prepare your own csv file
+By default, the third column of your csv should be the SJTU id of a student. The fourth column should be his total score.
+
+Prepare you csv following the rule above.
 
 ### Example
 Assignment p2 of VE280 Summer 2021 Section (Paul) is located at
