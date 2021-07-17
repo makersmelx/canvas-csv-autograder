@@ -23,7 +23,10 @@ canvas_full_score: the full score of this assignment on canvas
 csv_full_score: the full score of this assignment/homework on joj (or the full score that leads to the score in your csv)
 
 ### How to prepare your own csv file
-By default, the third column of your csv should be the SJTU id of a student. The fourth column should be his total score.
+By default, 
+1. The grade should start from the second row. Write any thing as the title row in the first row.
+2. the third column of your csv should be the SJTU id of a student. 
+3. The fourth column should be his total score.
 
 Prepare you csv following the rule above.
 
