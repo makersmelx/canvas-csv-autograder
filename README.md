@@ -20,17 +20,9 @@ course_id: It can be obtained from Canvas assignment page url. It is the id of t
 
 canvas_full_score: the full score of this assignment on canvas
 
-csv_full_score: the full score of this assignment/homework on joj (or the full score that leads to the score in your csv)
+csv_full_score: the full score of this assignment on JOJ (1.0) (or the full score that leads to the score in your csv)
 
-### How to prepare your own csv file
-By default, 
-1. The grade should start from the second row. Write any thing as the title row in the first row.
-2. the third column of your csv should be the SJTU id of a student. 
-3. The fourth column should be his total score.
-
-Prepare you csv following the rule above.
-
-### Example
+### Example: How to get the course and assignment id
 Assignment p2 of VE280 Summer 2021 Section (Paul) is located at
 ~~~
 https://umjicanvas.com/courses/2036/assignments/19399
@@ -42,8 +34,22 @@ If our exported csv from joj p2 judge is located at `/tmp/Project2Bot.csv`, and 
 PYTHONPATH=. python3 grade_from_joj.py /tmp/Project2Bot.csv 2036 19399 85 1200
 ~~~
 
+### Step by Step
+1. Run system test on JOJ (1.0). Go to the scoreboard and export the grades with CSV file
+2. Go to the Grade Page on Canvas. Set default grade for the assignment to grade if you haven't done so.
+3. Run this script with information fetched in Step 1 and 2
+4. Done
+
 ### Further
 You can check `settings.py` to modify the script as you need.
+
+### How to prepare your own csv file
+By default, 
+1. The grade should start from the second row. Write any thing as the title row in the first row.
+2. the third column of your csv should be the SJTU id of a student. 
+3. The fourth column should be his total score.
+
+Prepare you csv following the rule above.
 
 ### Issues
 You are welcomed to post an issue or pull request if you encounter any problems regarding this repo.
