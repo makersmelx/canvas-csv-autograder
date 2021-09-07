@@ -1,4 +1,4 @@
-# canvas-csv-autograder
+# canvas-joj-autograder
 Grade Canvas assignment based on scores stored in the csv file. It can work with the exported csv grades from Joint Online Judge.
 
 1. Set `CANVAS_TOKEN` at .env in the root directory
